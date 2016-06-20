@@ -129,6 +129,19 @@ Module.register("weatherforecast",{
 			minTempCell.className = "align-right min-temp";
 			row.appendChild(minTempCell);
 
+			var rainCell = document.createElement("td");
+			if (isNaN(forecast.rain))
+			{
+				rainCell.innerHTML = "";
+				rainCell.className = "align-right rain";
+			}
+			else
+			{
+				rainCell.innerHTML = forecast.rain + " mm";
+				rainCell.className = "align-right bright rain";
+			}
+			row.appendChild(rainCell);
+
 			if (this.config.fade && this.config.fadePoint < 1) {
 				if (this.config.fadePoint < 0) {
 					this.config.fadePoint = 0;
@@ -210,7 +223,8 @@ Module.register("weatherforecast",{
 				day: moment(forecast.dt, "X").format("ddd"),
 				icon: this.config.iconTable[forecast.weather[0].icon],
 				maxTemp: this.roundValue(forecast.temp.max),
-				minTemp: this.roundValue(forecast.temp.min)
+				minTemp: this.roundValue(forecast.temp.min),
+				rain: this.roundValue(forecast.rain)
 
 			});
 		}
