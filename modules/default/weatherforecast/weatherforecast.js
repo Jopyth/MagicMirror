@@ -85,8 +85,8 @@ Module.register("weatherforecast",{
 			return wrapper;
 		}
 
-		if (this.config.location === "") {
-			wrapper.innerHTML = "Please set the openweather <i>location</i> in the config for module: " + this.name + ".";
+		if (this.config.location === "" && this.config.location_id === "") {
+			wrapper.innerHTML = "Please set the openweather <i>location</i> or <i>id</i> in the config for module: " + this.name + ".";
 			wrapper.className = "dimmed light small";
 			return wrapper;
 		}
@@ -199,7 +199,14 @@ Module.register("weatherforecast",{
 	 */
 	getParams: function() {
 		var params = "?";
-		params += "q=" + this.config.location;
+		if (this.config.location === "")
+		{
+			params += "id=" + this.config.location_id;
+		}
+		else
+		{
+			params += "q=" + this.config.location;
+		}
 		params += "&units=" + this.config.units;
 		params += "&lang=" + this.config.lang;
 		params += "&APPID=" + this.config.appid;
