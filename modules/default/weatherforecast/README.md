@@ -14,6 +14,7 @@ modules: [
 		config: {
 			// See 'Configuration options' for more information.
 			location: 'Amsterdam,Netherlands',
+			locationID: '', //Location ID from http://bulk.openweather.org/sample/ 
 			appid: 'abcde12345abcde12345abcde12345ab' //openweathermap.org API key.
 		}
 	}
@@ -43,6 +44,13 @@ The following properties can be configured:
 			</td>
 		</tr>
 		<tr>
+			<td><code>locationID</code></td>
+			<td>Location ID from <a href="http://bulk.openweather.org/sample/">OpenWeather</a> <b>This will override anything you put in location.</b><br>Leave blank if you want to use location.
+				<br><b>Example:</b> <code>1234567</code>
+				<br><b>Default value:</b> <code></code>
+			</td>
+		</tr>
+		<tr>
 			<td><code>appid</code></td>
 			<td>The <a href="https://home.openweathermap.org" target="_blank">OpenWeatherMap</a> API key, which can be obtained by creating an OpenWeatherMap account.<br>
 				<br> This value is <b>REQUIRED</b>
@@ -53,6 +61,14 @@ The following properties can be configured:
 			<td>What units to use. Specified by config.js<br>
 				<br><b>Possible values:</b> <code>config.units</code> = Specified by config.js, <code>default</code> = Kelvin, <code>metric</code> = Celsius, <code>imperial</code> =Fahrenheit
 				<br><b>Default value:</b> <code>config.units</code>
+			</td>
+		</tr>
+		<tr>
+			<td><code>maxNumberOfDays</code></td>
+			<td>How many days of forecast to return. Specified by config.js<br>
+				<br><b>Possible values:</b> <code>1</code> - <code>16</code>
+				<br><b>Default value:</b> <code>7</code> (7 days)
+				<br>This value is optional. By default the weatherforecast module will return 7 days.
 			</td>
 		</tr>
 		<tr>

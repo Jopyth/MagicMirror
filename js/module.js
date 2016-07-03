@@ -58,7 +58,7 @@ var Module = Class.extend({
 	 * return Map<String, String> - A map with langKeys and filenames.
 	 */
 	getTranslations: function() {
-		return {};
+		return false;
 	},
 
 	/* getDom()
@@ -110,8 +110,22 @@ var Module = Class.extend({
 		Log.log(this.name + " received a socket notification: " + notification + " - Payload: " + payload);
 	},
 
+	/* suspend()
+	 * This method is called when a module is hidden.
+	 */
+	suspend: function() {
+		Log.log(this.name + " is suspend.");
+	},
+
+	/* resume()
+	 * This method is called when a module is shown.
+	 */
+	resume: function() {
+		Log.log(this.name + " is resumed.");
+	},
+
 	/*********************************************
-	 * The methods below don't need subclassing. *
+	 * The methods below don"t need subclassing. *
 	 *********************************************/
 
 	/* setData(data)
@@ -138,7 +152,7 @@ var Module = Class.extend({
 	},
 
 	/* socket()
-	 * Returns a socket object. If it doesn't exsist, it's created.
+	 * Returns a socket object. If it doesn"t exist, it"s created.
 	 * It also registers the notification callback.
 	 */
 	socket: function() {
@@ -221,11 +235,27 @@ var Module = Class.extend({
 	loadTranslations: function(callback) {
 		var self = this;
 		var translations = this.getTranslations();
-		var translationFile = translations && (translations[config.language.toLowerCase()] || translations.en) || undefined;
-		if(translationFile) {
- 			Translator.load(this, translationFile, callback);
+		var lang = config.language.toLowerCase();
+
+		// The variable `first` will contain the first
+		// defined translation after the following line.
+		for (var first in translations) {break;}
+
+		if (translations) {
+			var translationFile = translations[lang] || undefined;
+			var translationsFallbackFile = translations[first];
+
+			// If a translation file is set, load it and then also load the fallback translation file.
+			// Otherwise only load the fallback translation file.
+			if (translationFile !== undefined) {
+				Translator.load(self, translationFile, false, function() {
+					Translator.load(self, translationsFallbackFile, true, callback);
+				});
+			} else {
+				Translator.load(self, translationsFallbackFile, true, callback);
+			}
 		} else {
- 			callback();
+			callback();
 		}
 	},
 
@@ -236,7 +266,7 @@ var Module = Class.extend({
 	 * argument defaultValue string - The default value if no translation was found. (Optional)
  	 */
 	translate: function(key, defaultValue) {
-		return Translator.translate(this, key) || defaultValue || '';
+		return Translator.translate(this, key) || defaultValue || "";
 	},
 
 	/* updateDom(speed)
@@ -275,7 +305,13 @@ var Module = Class.extend({
 	 * argument callback function - Called when the animation is done.
 	 */
 	hide: function(speed, callback) {
-		MM.hideModule(this, speed, callback);
+		callback = callback || function() {};
+
+		var self = this;
+		MM.hideModule(self, speed, function() {
+			self.suspend();
+			callback();
+		});
 	},
 
 	/* showModule(module, speed, callback)
@@ -285,6 +321,7 @@ var Module = Class.extend({
 	 * argument callback function - Called when the animation is done.
 	 */
 	show: function(speed, callback) {
+		this.resume();
 		MM.showModule(this, speed, callback);
 	}
 });
@@ -299,7 +336,7 @@ Module.create = function(name) {
 			return obj;
 		}
 
-		var temp = obj.constructor(); // give temp the original obj's constructor
+		var temp = obj.constructor(); // give temp the original obj"s constructor
 		for (var key in obj) {
 			temp[key] = cloneObject(obj[key]);
 		}

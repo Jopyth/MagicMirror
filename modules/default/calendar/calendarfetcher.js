@@ -25,7 +25,12 @@ var CalendarFetcher = function(url, reloadInterval, maximumEntries, maximumNumbe
 		clearTimeout(reloadTimer);
 		reloadTimer = null;
 
-		ical.fromURL(url, {}, function(err, data) {
+		var opts = {
+			headers: {
+				'User-Agent': 'Mozilla/5.0 (Node.js 6.0.0) MagicMirror/v2 (https://github.com/MichMich/MagicMirror/)'
+			}
+		}
+		ical.fromURL(url, opts, function(err, data) {
 			if (err) {
 				fetchFailedCallback(self, err);
 				scheduleTimer();
@@ -55,14 +60,16 @@ var CalendarFetcher = function(url, reloadInterval, maximumEntries, maximumNumbe
 
 				if (event.type === "VEVENT") {
 
-					//console.log(event);
-
 					var startDate = (event.start.length === 8) ? moment(event.start, "YYYYMMDD") : moment(new Date(event.start));
 					var endDate;
 					if (typeof event.end !== "undefined") {
 						endDate = (event.end.length === 8) ? moment(event.end, "YYYYMMDD") : moment(new Date(event.end));
 					} else {
-						endDate = startDate;
+						if (!isFacebookBirthday) {
+							endDate = startDate;
+						} else {
+							endDate = moment(startDate).add(1, 'days');
+						}
 					}
 
 					// calculate the duration f the event for use with recurring events.
@@ -70,6 +77,13 @@ var CalendarFetcher = function(url, reloadInterval, maximumEntries, maximumNumbe
 
 					if (event.start.length === 8) {
 						startDate = startDate.startOf("day");
+					}
+
+					var title = "Event";
+					if (event.summary) {
+						title = (typeof event.summary.val !== "undefined") ? event.summary.val : event.summary;
+					} else if(event.description) {
+						title = event.description;
 					}
 
 					if (typeof event.rrule != "undefined" && !isFacebookBirthday) {
@@ -81,18 +95,18 @@ var CalendarFetcher = function(url, reloadInterval, maximumEntries, maximumNumbe
 							endDate  = moment(parseInt(startDate.format("x")) + duration, 'x');
 							if (endDate.format("x") > now) {
 								newEvents.push({
-									title: (typeof event.summary.val !== "undefined") ? event.summary.val : event.summary,
+									title: title,
 									startDate: startDate.format("x"),
 									endDate: endDate.format("x"),
-									fullDayEvent: isFullDayEvent(event)
+									fullDayEvent: isFullDayEvent(event),
+									firstYear: event.start.getFullYear()
 								});
 							}
 						}
 					} else {
 						// console.log("Single event ...");
 						// Single event.
-						var fullDayEvent = isFullDayEvent(event);
-						var title = (typeof event.summary.val !== "undefined") ? event.summary.val : event.summary;
+						var fullDayEvent = (isFacebookBirthday) ? true : isFullDayEvent(event);
 
 						if (!fullDayEvent && endDate < new Date()) {
 							//console.log("It's not a fullday event, and it is in the past. So skip: " + title);
@@ -179,7 +193,7 @@ var CalendarFetcher = function(url, reloadInterval, maximumEntries, maximumNumbe
 	};
 
 	/* broadcastItems()
-	 * Broadcast the exsisting events.
+	 * Broadcast the existing events.
 	 */
 	this.broadcastEvents = function() {
 		//console.log('Broadcasting ' + events.length + ' events.');
