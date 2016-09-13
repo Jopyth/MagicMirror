@@ -38,13 +38,33 @@ Module.register("clock",{
 		// Schedule update interval.
 		var self = this;
 		setInterval(function() {
+			if (self.pause)
+			{
+				return;
+			}
 			self.updateDom();
 		}, 1000);
 
 		// Set locale.
 		moment.locale(config.language);
 
+		this.pause = true;
+
 	},
+	// Override notificationReceived for user presence
+	notificationReceived: function(notification, payload, sender) {
+		if (notification === "USER_PRESENCE") {
+			if (payload === true)
+			{
+				this.pause = false;
+			}
+			else
+			{
+				this.pause = true;
+			}
+		}
+	},
+
 	// Override dom generator.
 	getDom: function() {
 
