@@ -17,6 +17,32 @@
 }
 
 .calendar .time {
-  padding-left: 30px;
+  padding-left: 15px;
   text-align: right;
+}
+
+/* The basic container */
+.longtextcontainer {
+    overflow: hidden;
+
+    width: 150px;
+    
+    /* To make the width of the container exact. */
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.longtextcontent {
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;    /* Required to make ellipsis work */
+  text-overflow: clip;
+
+  left: 0%;
+  width: 100%;
+  
+  -webkit-transition: left 3s, width 3s;
+  -moz-transition: left 3s, width 3s;
+  transition: left 3s, width 3s;
 }

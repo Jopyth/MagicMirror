@@ -18,6 +18,7 @@ Module.register("calendar",{
 		displayRepeatingCountTitle: false,
 		defaultRepeatingCountTitle: '',
 		maxTitleLength: 25,
+		maxTitleWidth: 0,
 		fetchInterval: 5 * 60 * 1000, // Update every 5 minutes.
 		animationSpeed: 2000,
 		fade: true,
@@ -67,8 +68,21 @@ Module.register("calendar",{
 			this.addCalendar(calendar.url);
 		}
 
+		if (this.config.maxTitleWidth > 0)
+		{
+			var self = this;
+			// scroll text back and forth every 5 seconds
+			setInterval(function() {
+				self.scrollTextItems();
+			}, 5 * 1000);
+			// dictionary to save elements which are too big and their width
+			this.scrollLeft = true;
+		}
+
 		this.calendarData = {};
 		this.loaded = false;
+
+		this.pause = false;
 	},
 
 	// Override socket notification handler.
@@ -87,6 +101,19 @@ Module.register("calendar",{
 		}
 
 		this.updateDom(this.config.animationSpeed);
+	},
+
+	notificationReceived: function(notification, payload, sender) {
+		if (notification === "USER_PRESENCE") {
+			if (payload === true)
+			{
+				this.pause = true;
+			}
+			else
+			{
+				this.pause = false;
+			}
+		}
 	},
 
 	// Override dom generator.
@@ -120,6 +147,7 @@ Module.register("calendar",{
 			var titleWrapper = document.createElement("td"),
 				repeatingCountTitle = '';
 
+			var titleContent = document.createElement("div");
 
 			if (this.config.displayRepeatingCountTitle) {
 
@@ -133,9 +161,28 @@ Module.register("calendar",{
 				}
 			}
 
-			titleWrapper.innerHTML = this.titleTransform(event.title) + repeatingCountTitle;
-			titleWrapper.className = "title bright";
-			eventWrapper.appendChild(titleWrapper);
+			titleContent.innerHTML = this.titleTransform(event.title) + repeatingCountTitle;
+			
+			if (this.config.maxTitleWidth > 0)
+			{
+				var titleContainer = document.createElement("div");
+	
+				titleContent.className = "longtextcontent title bright";
+
+
+				titleContainer.className = "longtextcontainer";
+				titleContainer.style.width = this.config.maxTitleWidth;
+				titleContainer.appendChild(titleContent);
+				
+				titleWrapper.appendChild(titleContainer);
+				
+				eventWrapper.appendChild(titleWrapper);
+			}
+			else
+			{
+				titleContent.className = "title bright";
+				eventWrapper.appendChild(titleContent);
+			}
 
 			var timeWrapper =  document.createElement("td");
 			//console.log(event.today);
@@ -225,6 +272,47 @@ Module.register("calendar",{
 		}
 
 		return wrapper;
+	},
+
+	/* scrollTextItems(url)
+	 * Scrolls all overflowing text items left and right
+	 */
+	scrollTextItems: function() {
+		if (this.pause) {
+			return;
+		}
+		var scrollable = document.getElementsByClassName('longtextcontent title');
+		for (var i = 0; i < scrollable.length; i++)
+		{
+			var element = scrollable[i];
+			var width = this.getTextWidth(element.innerHTML) + 5;
+
+			var left = 0;
+			if (this.scrollLeft && width > this.config.maxTitleWidth)
+			{
+				left = this.config.maxTitleWidth - width;
+			}
+			element.style.left = left + "px";
+			element.style.width = width + "px";
+		}
+		this.scrollLeft = !this.scrollLeft;
+	},
+
+	/**
+	* Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
+	* 
+	* @param {String} text The text to be rendered.
+	* @param {String} font The css font descriptor that text is to be rendered with (e.g. "bold 14px verdana").
+	* 
+	* @see http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript/21015393#21015393
+	*/
+	getTextWidth: function(text) {
+		// re-use canvas object for better performance
+		var canvas = this.getTextWidth.canvas || (this.getTextWidth.canvas = document.createElement("canvas"));
+		var context = canvas.getContext("2d");
+		context.font = "20px RobotoCondensed";
+		var metrics = context.measureText(text);
+		return metrics.width;
 	},
 
 	/* hasCalendarURL(url)
@@ -351,7 +439,10 @@ Module.register("calendar",{
 			title = title.replace(needle, replacement);
 		}
 
-		title = this.shorten(title, this.config.maxTitleLength);
+		if (this.config.maxTitleLength > 0)
+		{
+			title = this.shorten(title, this.config.maxTitleLength);
+		}
 		return title;
 	}
 });

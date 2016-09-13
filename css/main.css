@@ -8,10 +8,10 @@ html {
 }
 
 body {
-  margin: 60px;
+  margin: 0px 30px 60px 30px;
   position: absolute;
-  height: calc(100% - 120px);
-  width: calc(100% - 120px);
+  height: calc(100% - 60px);
+  width: calc(100% - 60px);
   background: #000;
   color: #aaa;
   font-family: "Roboto Condensed", sans-serif;
@@ -130,9 +130,9 @@ sup {
 
 .region.fullscreen {
   position: absolute;
-  top: -60px;
-  left: -60px;
-  right: -60px;
+  top: 0px;
+  left: -30px;
+  right: -30px;
   bottom: -60px;
 }
 
