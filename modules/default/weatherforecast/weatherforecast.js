@@ -102,7 +102,7 @@ Module.register("weatherforecast",{
 		}
 
 		if (!this.loaded) {
-			wrapper.innerHTML = this.translate('LOADING');
+			wrapper.innerHTML = "<span class='small fa fa-refresh fa-spin fa-fw'></span>";
 			wrapper.className = "dimmed light small";
 			return wrapper;
 		}

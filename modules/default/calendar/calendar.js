@@ -285,7 +285,7 @@ Module.register("calendar",{
 		for (var i = 0; i < scrollable.length; i++)
 		{
 			var element = scrollable[i];
-			var width = this.getTextWidth(element.innerHTML) + 5;
+			var width = this.getTextWidth(element.innerHTML);
 
 			var left = 0;
 			if (this.scrollLeft && width > this.config.maxTitleWidth)

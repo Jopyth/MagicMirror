@@ -105,7 +105,7 @@ Module.register("clock",{
 				timeString = moment().format("h:mm");
 			}
 		}
-		dateWrapper.innerHTML = moment().format("dddd, LL");
+		dateWrapper.innerHTML = moment().format("LL") + "<br>" + moment().format("dddd");
 		timeWrapper.innerHTML = timeString;
 		secondsWrapper.innerHTML = moment().format("ss");
 		if (this.config.showPeriodUpper) {
