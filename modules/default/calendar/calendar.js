@@ -82,7 +82,7 @@ Module.register("calendar",{
 		this.calendarData = {};
 		this.loaded = false;
 
-		this.pause = true;
+		this.pause = false;
 	},
 
 	// Override socket notification handler.

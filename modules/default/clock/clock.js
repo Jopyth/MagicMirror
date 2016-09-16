@@ -48,7 +48,7 @@ Module.register("clock",{
 		// Set locale.
 		moment.locale(config.language);
 
-		this.pause = true;
+		this.pause = false;
 
 	},
 	// Override notificationReceived for user presence
