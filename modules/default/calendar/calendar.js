@@ -124,7 +124,7 @@ Module.register("calendar",{
 		wrapper.className = "small";
 
 		if (events.length === 0) {
-			wrapper.innerHTML = (this.loaded) ? this.translate("EMPTY") : this.translate("LOADING");
+			wrapper.innerHTML = (this.loaded) ? this.translate("EMPTY") : "<span class='small fa fa-refresh fa-spin fa-fw'></span>";
 			wrapper.className = "small dimmed";
 			return wrapper;
 		}
