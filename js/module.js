@@ -198,7 +198,7 @@ var Module = Class.extend({
 
 			if (!current.interval)
 			{
-				callback();
+				current.callback();
 
 				current.interval = setInterval(current.callback, current.time);
 			}
