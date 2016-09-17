@@ -120,23 +120,91 @@ var Module = Class.extend({
 		Log.log(this.name + " received a socket notification: " + notification + " - Payload: " + payload);
 	},
 
-	/* suspend()
+	/* onSuspend()
 	 * This method is called when a module is hidden.
 	 */
-	suspend: function() {
+	onSuspend: function() {
 		Log.log(this.name + " is suspended.");
 	},
 
-	/* resume()
+	/* onResume()
 	 * This method is called when a module is shown.
 	 */
-	resume: function() {
+	onResume: function() {
 		Log.log(this.name + " is resumed.");
 	},
 
 	/*********************************************
 	 * The methods below don"t need subclassing. *
 	 *********************************************/
+
+	/* checkUserPresence(notification, payload, sender)
+	 * Use this method to conveniently suspend your module when no user is present.
+	 */
+	checkUserPresence: function(notification, payload, sender) {
+		if (sender && notification === "USER_PRESENCE") {
+			if (payload === true)
+			{
+				this.resume();
+			}
+			else
+			{
+				this.suspend();
+			}
+		}
+	},
+
+	// contains auto suspending autoIntervals
+	autoIntervals: [],
+
+	/* addAutoSuspendingInterval(callback, time)
+	 * Use instead of setInterval for automatic pause when on suspend.
+	 * The callback is executed immediately once after the user returns.
+	 */
+	addAutoSuspendingInterval: function(callback, time) {
+		var newInterval = setInterval(callback, time);
+		this.autoIntervals.push({
+			callback: callback,
+			interval: newInterval,
+			time: time
+		});
+	},
+
+	/* suspend()
+	 * This method is called when a module is hidden.
+	 */
+	suspend: function() {
+		for (var i = 0; i < this.autoIntervals.length; i++)
+		{
+			var current = this.autoIntervals[i];
+
+			if (current.interval)
+			{
+				clearInterval(current.interval);
+
+				current.interval = null;
+			}
+		}
+		this.onSuspend();
+	},
+
+	/* resume()
+	 * This method is called when a module is shown.
+	 */
+	resume: function() {
+		for (var i = 0; i < this.autoIntervals.length; i++)
+		{
+			var current = this.autoIntervals[i];
+
+			if (!current.interval)
+			{
+				callback();
+
+				current.interval = setInterval(current.callback, current.time);
+			}
+		}
+		this.onResume();
+	},
 
 	/* setData(data)
 	 * Set the module data.

@@ -71,10 +71,12 @@ Module.register("calendar",{
 		if (this.config.maxTitleWidth > 0)
 		{
 			var self = this;
+			
 			// scroll text back and forth every 5 seconds
-			setInterval(function() {
+			this.addAutoSuspendingInterval(function() {
 				self.scrollTextItems();
 			}, 5 * 1000);
+
 			// dictionary to save elements which are too big and their width
 			this.scrollLeft = true;
 		}
@@ -104,16 +106,7 @@ Module.register("calendar",{
 	},
 
 	notificationReceived: function(notification, payload, sender) {
-		if (notification === "USER_PRESENCE") {
-			if (payload === true)
-			{
-				this.pause = false;
-			}
-			else
-			{
-				this.pause = true;
-			}
-		}
+		this.checkUserPresence(notification, payload, sender);
 	},
 
 	// Override dom generator.

@@ -37,11 +37,7 @@ Module.register("clock",{
 
 		// Schedule update interval.
 		var self = this;
-		setInterval(function() {
-			if (self.pause)
-			{
-				return;
-			}
+		this.addAutoSuspendingInterval(function () {
 			self.updateDom();
 		}, 1000);
 
@@ -53,16 +49,7 @@ Module.register("clock",{
 	},
 	// Override notificationReceived for user presence
 	notificationReceived: function(notification, payload, sender) {
-		if (notification === "USER_PRESENCE") {
-			if (payload === true)
-			{
-				this.pause = false;
-			}
-			else
-			{
-				this.pause = true;
-			}
-		}
+		this.checkUserPresence(notification, payload, sender);
 	},
 
 	// Override dom generator.
