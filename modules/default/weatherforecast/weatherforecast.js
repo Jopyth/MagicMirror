@@ -59,7 +59,7 @@ Module.register("weatherforecast",{
 
 	// Define required scripts.
 	getStyles: function() {
-		return ["weather-icons.css", "weatherforecast.css"];
+		return ["weather-icons.css", "weatherforecast.css", "font-awesome.css"];
 	},
 
 	// Define required translations.
