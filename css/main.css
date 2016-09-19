@@ -8,7 +8,7 @@ html {
 }
 
 body {
-  margin: 0px 30px 60px 30px;
+  margin: 30px 30px 30px 30px;
   position: absolute;
   height: calc(100% - 60px);
   width: calc(100% - 60px);
@@ -130,10 +130,10 @@ sup {
 
 .region.fullscreen {
   position: absolute;
-  top: 0px;
+  top: -30px;
   left: -30px;
   right: -30px;
-  bottom: -60px;
+  bottom: -30px;
 }
 
 .region.right {
